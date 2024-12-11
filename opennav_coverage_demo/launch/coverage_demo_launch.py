@@ -36,9 +36,9 @@ def generate_launch_description():
              '-s', 'libgazebo_ros_factory.so', world],
         cwd=[coverage_demo_dir], output='screen')
 
-    # start_gazebo_client_cmd = ExecuteProcess(
-    #     cmd=['gzclient'],
-    #     cwd=[coverage_demo_dir], output='screen')
+    start_gazebo_client_cmd = ExecuteProcess(
+        cmd=['gzclient'],
+        cwd=[coverage_demo_dir], output='screen')
 
     urdf = os.path.join(nav2_bringup_dir, 'urdf', 'turtlebot3_waffle.urdf')
     with open(urdf, 'r') as infp:
@@ -92,7 +92,7 @@ def generate_launch_description():
 
     ld = LaunchDescription()
     ld.add_action(start_gazebo_server_cmd)
-    # ld.add_action(start_gazebo_client_cmd)
+    ld.add_action(start_gazebo_client_cmd)
     ld.add_action(start_robot_state_publisher_cmd)
     ld.add_action(start_gazebo_spawner_cmd)
     ld.add_action(rviz_cmd)

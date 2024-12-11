@@ -1,0 +1,50 @@
+<GAOS_parcel xmlns:gml="http://www.opengis.net/gml" id="maize-field">
+    <Field area="20.0" best_angle="0" cost_if_no_crop="0.23" date="2024-12-05"
+        greening_subsidy="0.1667" id="boundary" increment="0.05" lineage="Unknown"
+        penalty_additnl_swath="7.285" sprayer_width="39" swath_width="3">
+        <geometry>
+            <gml:Polygon srsName="map">
+                <gml:outerBoundaryIs>
+                    <gml:LinearRing>
+                        <gml:coordinates>-5.0,-5.0 -5.0,5.0 5.0,5.0 5.0,-5.0 -5.0,-5.0</gml:coordinates>
+                    </gml:LinearRing>
+                </gml:outerBoundaryIs>
+            </gml:Polygon>
+        </geometry>
+    </Field>
+    <Row id="1">
+        <geometry>
+            <gml:LineString srsName="map">
+                <gml:coordinates>-3.0,-3.0 -3.0,3.0</gml:coordinates>
+            </gml:LineString>
+        </geometry>
+    </Row>
+    <Row id="2">
+        <geometry>
+            <gml:LineString srsName="map">
+                <gml:coordinates>-1.5,-3.0 -1.5,3.0</gml:coordinates>
+            </gml:LineString>
+        </geometry>
+    </Row>
+    <Row id="3">
+        <geometry>
+            <gml:LineString srsName="map">
+                <gml:coordinates>0.0,-3.0 0.0,3.0</gml:coordinates>
+            </gml:LineString>
+        </geometry>
+    </Row>
+    <Row id="4">
+        <geometry>
+            <gml:LineString srsName="map">
+                <gml:coordinates>1.5,-3.0 1.5,3.0</gml:coordinates>
+            </gml:LineString>
+        </geometry>
+    </Row>
+    <Row id="5">
+        <geometry>
+            <gml:LineString srsName="map">
+                <gml:coordinates>3.0,-3.0 3.0,3.0</gml:coordinates>
+            </gml:LineString>
+        </geometry>
+    </Row>
+</GAOS_parcel>

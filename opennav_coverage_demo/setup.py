@@ -30,6 +30,10 @@ setup(
         'console_scripts': [
                 'demo_coverage = opennav_coverage_demo.demo_coverage:main',
                 'demo_row_coverage = opennav_coverage_demo.demo_row_coverage:main',
+                'demo_coverage_custom = opennav_coverage_demo.demo_coverage_custom:main',
+                'demo_row_coverage_custom = opennav_coverage_demo.demo_row_coverage_custom:main',
+                'demo_coverage_maize = opennav_coverage_demo.demo_coverage_maize:main',
+                'demo_row_coverage_maize = opennav_coverage_demo.demo_row_coverage_maize:main',
         ],
     },
 )
