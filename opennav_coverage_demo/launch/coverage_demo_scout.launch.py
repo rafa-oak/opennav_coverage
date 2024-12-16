@@ -83,7 +83,7 @@ def generate_launch_description():
             "scout",
             "-topic",
             "robot_description",
-            '-x', '6.13', '-y', '15.0', '-z', '1.00',
+            '-x', '-10', '-y', '-10', '-z', '1.00',
             '-R', '0.0', '-P', '0.0', '-Y', '0.0',
             "--ros-args",
             "--log-level",
@@ -128,7 +128,7 @@ def generate_launch_description():
         ],
     )
     # start the visualization
-    rviz_config = os.path.join(coverage_demo_dir, 'opennav_coverage_demo.rviz')
+    rviz_config = os.path.join(coverage_demo_dir, 'rviz_config.rviz')
     # print("rviz_config:", rviz_config)
     rviz_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -138,41 +138,37 @@ def generate_launch_description():
     # start navigation
     bringup_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(coverage_demo_dir, 'row_bringup_launch_scout.py')),
+            os.path.join(coverage_demo_dir, 'bringup_scout.launch.py')),
         launch_arguments={'params_file': param_file_path}.items())
 
-    # Demo GPS->map->odom transform, no localization. For visualization & controller transform
+    # world->odom transform, no localization. For visualization & controller transform
     fake_localization_cmd = Node(
             package='tf2_ros',
             executable='static_transform_publisher',
             output='screen',
-            arguments=['6.13', '15', '0', '0', '0', '0.0', 'map', 'odom'])
-    fake_gps_cmd = Node(
-            package='tf2_ros',
-            executable='static_transform_publisher',
-            output='screen',
-            arguments=['0', '0', '0', '0', '0', '0', 'EPSG:4258', 'map'])
+            arguments=['-10', '-10', '0', '0', '0', '0', 'map', 'odom'])
 
 
+    # Localize using odometry and IMU data. 
+    # It can be turned off because the navigation stack uses AMCL with lidar data for localization
+    robot_localization_node = Node(
+        package="robot_localization",
+        executable="ekf_node",
+        name="ekf_filter_node",
+        output="screen",
+        parameters=[
+            os.path.join(scout_nav2_gz_path, "config/ekf.yaml"),
+            {"use_sim_time": use_sim_time},
+        ],
+    )
     # start the demo task
     demo_cmd = Node(
         package='opennav_coverage_demo',
-        executable='demo_row_coverage',
+        executable='demo_coverage_custom',
         emulate_tty=True,
         output='screen')
 
-    relay_odom = Node(
-        name="relay_odom",
-        package="topic_tools",
-        executable="relay",
-        parameters=[
-            {
-                "input_topic": "/diff_drive_base_controller/odom",
-                "output_topic": "/odom",
-            }
-        ],
-        output="screen",
-    )
+
 
     load_joint_state_controller = ExecuteProcess(
         name="activate_joint_state_broadcaster",
@@ -202,6 +198,18 @@ def generate_launch_description():
         output="screen",
     )
 
+    relay_odom = Node(
+        name="relay_odom",
+        package="topic_tools",
+        executable="relay",
+        parameters=[
+            {
+                "input_topic": "/diff_drive_base_controller/odom",
+                "output_topic": "/odom",
+            }
+        ],
+        output="screen",
+    )
     relay_cmd_vel = Node(
         name="relay_cmd_vel",
         package="topic_tools",
@@ -297,7 +305,7 @@ def generate_launch_description():
             rviz_cmd,
             bringup_cmd,
             fake_localization_cmd,
-            fake_gps_cmd,
+            #robot_localization_node,
             demo_cmd,
             relay_odom,
             relay_cmd_vel,            

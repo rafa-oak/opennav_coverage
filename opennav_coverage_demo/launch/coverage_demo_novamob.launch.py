@@ -29,13 +29,13 @@ def generate_launch_description():
     nav2_bringup_dir = get_package_share_directory('nav2_bringup')
     coverage_demo_dir = get_package_share_directory('opennav_coverage_demo')
     # Get the path to the scout_v2.xacro file
-    scout_nav2_gz_path = get_package_share_directory('scout_nav2_gz')
+    scout_nav2_gz_path = get_package_share_directory('novamob_nav2_gz')
 
-    default_world_path = os.path.join(scout_nav2_gz_path, 'world/maize_field.world')
-    param_file_path = os.path.join(coverage_demo_dir, 'demo_params_scout.yaml')
+    default_world_path = os.path.join(coverage_demo_dir, 'empty.sdf')
+    param_file_path = os.path.join(coverage_demo_dir, 'demo_params_novamob.yaml')
 
-    default_model_path = os.path.join(scout_nav2_gz_path, "urdf/scout_v2/scout_v2.xacro")
-    trailer_model_path = os.path.join(scout_nav2_gz_path, "urdf/scout_v2/scout_v2_trailer.xacro")
+    default_model_path = os.path.join(scout_nav2_gz_path, "src/description/novamob_description.urdf")
+    trailer_model_path = os.path.join(scout_nav2_gz_path, "src/description/novamob_trailer_description.urdf")
     gz_models_path = os.path.join(scout_nav2_gz_path, "models")
 
 
@@ -80,10 +80,10 @@ def generate_launch_description():
         output="screen",
         arguments=[
             "-name",
-            "scout",
+            "novamob",
             "-topic",
             "robot_description",
-            '-x', '-3.7', '-y', '-3.5', '-z', '1.00',
+            '-x', '-10', '-y', '-10', '-z', '1.00',
             '-R', '0.0', '-P', '0.0', '-Y', '0.0',
             "--ros-args",
             "--log-level",
@@ -138,26 +138,20 @@ def generate_launch_description():
     # start navigation
     bringup_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(coverage_demo_dir, 'row_bringup_launch_scout.py')),
+            os.path.join(coverage_demo_dir, 'bringup_scout.launch.py')),
         launch_arguments={'params_file': param_file_path}.items())
 
-    # Demo GPS->map->odom transform, no localization. For visualization & controller transform
+    # world->odom transform, no localization. For visualization & controller transform
     fake_localization_cmd = Node(
             package='tf2_ros',
             executable='static_transform_publisher',
             output='screen',
-            arguments=['-3.5', '-3.5', '0', '0', '0', '0.0', 'map', 'odom'])
-    fake_gps_cmd = Node(
-            package='tf2_ros',
-            executable='static_transform_publisher',
-            output='screen',
-            arguments=['0', '0', '0', '0', '0', '0', 'EPSG:4258', 'map'])
-
+            arguments=['-10', '-10', '0', '0', '0', '0', 'map', 'odom'])
 
     # start the demo task
     demo_cmd = Node(
         package='opennav_coverage_demo',
-        executable='demo_row_coverage_maize',
+        executable='demo_coverage_custom',
         emulate_tty=True,
         output='screen')
 
@@ -297,7 +291,6 @@ def generate_launch_description():
             rviz_cmd,
             bringup_cmd,
             fake_localization_cmd,
-            fake_gps_cmd,
             demo_cmd,
             relay_odom,
             relay_cmd_vel,            

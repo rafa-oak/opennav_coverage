@@ -31,7 +31,7 @@ def generate_launch_description():
     # Get the path to the scout_v2.xacro file
     scout_nav2_gz_path = get_package_share_directory('scout_nav2_gz')
 
-    default_world_path = os.path.join(scout_nav2_gz_path, 'world/maize_field.world')
+    default_world_path = os.path.join(coverage_demo_dir, 'empty.sdf')
     param_file_path = os.path.join(coverage_demo_dir, 'demo_params_scout.yaml')
 
     default_model_path = os.path.join(scout_nav2_gz_path, "urdf/scout_v2/scout_v2.xacro")
@@ -83,7 +83,7 @@ def generate_launch_description():
             "scout",
             "-topic",
             "robot_description",
-            '-x', '-5.0', '-y', '-5.0', '-z', '1.00',
+            '-x', '6.13', '-y', '15.0', '-z', '1.00',
             '-R', '0.0', '-P', '0.0', '-Y', '0.0',
             "--ros-args",
             "--log-level",
@@ -138,20 +138,26 @@ def generate_launch_description():
     # start navigation
     bringup_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(coverage_demo_dir, 'bringup_launch_scout.py')),
+            os.path.join(coverage_demo_dir, 'row_bringup_scout.launch.py')),
         launch_arguments={'params_file': param_file_path}.items())
 
-    # world->odom transform, no localization. For visualization & controller transform
+    # Demo GPS->map->odom transform, no localization. For visualization & controller transform
     fake_localization_cmd = Node(
             package='tf2_ros',
             executable='static_transform_publisher',
             output='screen',
-            arguments=['-5', '-5', '0', '0', '0', '0', 'map', 'odom'])
+            arguments=['6.13', '15', '0', '0', '0', '0.0', 'map', 'odom'])
+    fake_gps_cmd = Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            output='screen',
+            arguments=['0', '0', '0', '0', '0', '0', 'EPSG:4258', 'map'])
+
 
     # start the demo task
     demo_cmd = Node(
         package='opennav_coverage_demo',
-        executable='demo_coverage_maize',
+        executable='demo_row_coverage',
         emulate_tty=True,
         output='screen')
 
@@ -291,6 +297,7 @@ def generate_launch_description():
             rviz_cmd,
             bringup_cmd,
             fake_localization_cmd,
+            fake_gps_cmd,
             demo_cmd,
             relay_odom,
             relay_cmd_vel,            

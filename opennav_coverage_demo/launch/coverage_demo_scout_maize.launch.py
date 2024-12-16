@@ -29,13 +29,13 @@ def generate_launch_description():
     nav2_bringup_dir = get_package_share_directory('nav2_bringup')
     coverage_demo_dir = get_package_share_directory('opennav_coverage_demo')
     # Get the path to the scout_v2.xacro file
-    scout_nav2_gz_path = get_package_share_directory('novamob_nav2_gz')
+    scout_nav2_gz_path = get_package_share_directory('scout_nav2_gz')
 
-    default_world_path = os.path.join(coverage_demo_dir, 'empty.sdf')
-    param_file_path = os.path.join(coverage_demo_dir, 'demo_params_novamob.yaml')
+    default_world_path = os.path.join(scout_nav2_gz_path, 'world/maize_field.world')
+    param_file_path = os.path.join(coverage_demo_dir, 'demo_params_scout.yaml')
 
-    default_model_path = os.path.join(scout_nav2_gz_path, "src/description/novamob_description.urdf")
-    trailer_model_path = os.path.join(scout_nav2_gz_path, "src/description/novamob_trailer_description.urdf")
+    default_model_path = os.path.join(scout_nav2_gz_path, "urdf/scout_v2/scout_v2.xacro")
+    trailer_model_path = os.path.join(scout_nav2_gz_path, "urdf/scout_v2/scout_v2_trailer.xacro")
     gz_models_path = os.path.join(scout_nav2_gz_path, "models")
 
 
@@ -80,10 +80,10 @@ def generate_launch_description():
         output="screen",
         arguments=[
             "-name",
-            "novamob",
+            "scout",
             "-topic",
             "robot_description",
-            '-x', '-10', '-y', '-10', '-z', '1.00',
+            '-x', '-5.0', '-y', '-5.0', '-z', '1.00',
             '-R', '0.0', '-P', '0.0', '-Y', '0.0',
             "--ros-args",
             "--log-level",
@@ -138,7 +138,7 @@ def generate_launch_description():
     # start navigation
     bringup_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(coverage_demo_dir, 'bringup_launch_scout.py')),
+            os.path.join(coverage_demo_dir, 'bringup_scout.launch.py')),
         launch_arguments={'params_file': param_file_path}.items())
 
     # world->odom transform, no localization. For visualization & controller transform
@@ -146,12 +146,12 @@ def generate_launch_description():
             package='tf2_ros',
             executable='static_transform_publisher',
             output='screen',
-            arguments=['-10', '-10', '0', '0', '0', '0', 'map', 'odom'])
+            arguments=['-5', '-5', '0', '0', '0', '0', 'map', 'odom'])
 
     # start the demo task
     demo_cmd = Node(
         package='opennav_coverage_demo',
-        executable='demo_coverage_custom',
+        executable='demo_coverage_maize',
         emulate_tty=True,
         output='screen')
 
