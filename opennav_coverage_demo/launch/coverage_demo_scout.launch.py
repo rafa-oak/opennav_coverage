@@ -18,7 +18,7 @@ from ament_index_python.packages import get_package_share_directory
 
 import launch
 from launch import LaunchDescription
-from launch.actions import ExecuteProcess, IncludeLaunchDescription, DeclareLaunchArgument, SetEnvironmentVariable,  RegisterEventHandler
+from launch.actions import ExecuteProcess, IncludeLaunchDescription, DeclareLaunchArgument, SetEnvironmentVariable, RegisterEventHandler, LogInfo
 from launch.substitutions import LaunchConfiguration, Command, PythonExpression, FindExecutable
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.event_handlers import OnProcessExit
@@ -128,7 +128,7 @@ def generate_launch_description():
         ],
     )
     # start the visualization
-    rviz_config = os.path.join(coverage_demo_dir, 'rviz_config.rviz')
+    rviz_config = os.path.join(coverage_demo_dir, 'opennav_coverage_demo.rviz')
     # print("rviz_config:", rviz_config)
     rviz_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -146,7 +146,7 @@ def generate_launch_description():
             package='tf2_ros',
             executable='static_transform_publisher',
             output='screen',
-            arguments=['-10', '-10', '0', '0', '0', '0', 'map', 'odom'])
+            arguments=['-5', '-5', '0', '0', '0', '0', 'map', 'odom'])
 
 
     # Localize using odometry and IMU data. 
@@ -161,6 +161,38 @@ def generate_launch_description():
             {"use_sim_time": use_sim_time},
         ],
     )
+
+
+    # Navigation goal node
+    nav_goal_node = Node(
+        package='nav2_simple_commander',
+        executable='navigate_to_pose',
+        name='navigate_to_pose',
+        output='screen',
+        parameters=[{
+            'goal_pose': {
+                'header': {
+                    'frame_id': 'map'
+                },
+                'pose': {
+                    'position': {
+                        'x': -10.0,
+                        'y': -10.0,
+                        'z': 0.0
+                    },
+                    'orientation': {
+                        'x': 0.0,
+                        'y': 0.0,
+                        'z': 0.0,
+                        'w': 1.0
+                    }
+                }
+            }
+        }],
+    )
+
+
+
     # start the demo task
     demo_cmd = Node(
         package='opennav_coverage_demo',
@@ -169,6 +201,13 @@ def generate_launch_description():
         output='screen')
 
 
+    # Event handler to start demo_cmd after nav_goal_node reaches the goal
+    start_demo_cmd = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=nav_goal_node,
+            on_exit=[LogInfo(msg="Navigation goal reached, starting demo task"), demo_cmd]
+        )
+    )
 
     load_joint_state_controller = ExecuteProcess(
         name="activate_joint_state_broadcaster",
@@ -306,8 +345,10 @@ def generate_launch_description():
             bringup_cmd,
             fake_localization_cmd,
             #robot_localization_node,
+            #nav_goal_node,
             demo_cmd,
             relay_odom,
-            relay_cmd_vel,            
+            relay_cmd_vel, 
+            #start_demo_cmd           
         ] + gazebo
     )
