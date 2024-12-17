@@ -28,15 +28,15 @@ from launch_ros.actions import Node
 def generate_launch_description():
     nav2_bringup_dir = get_package_share_directory('nav2_bringup')
     coverage_demo_dir = get_package_share_directory('opennav_coverage_demo')
-    # Get the path to the scout_v2.xacro file
-    scout_nav2_gz_path = get_package_share_directory('novamob_nav2_gz')
+    # Get the path to the novamob urdf file
+    novamob_nav2_gz_path = get_package_share_directory('novamob_nav2_gz')
 
     default_world_path = os.path.join(coverage_demo_dir, 'empty.sdf')
     param_file_path = os.path.join(coverage_demo_dir, 'demo_params_novamob.yaml')
 
-    default_model_path = os.path.join(scout_nav2_gz_path, "src/description/novamob_description.urdf")
-    trailer_model_path = os.path.join(scout_nav2_gz_path, "src/description/novamob_trailer_description.urdf")
-    gz_models_path = os.path.join(scout_nav2_gz_path, "models")
+    default_model_path = os.path.join(novamob_nav2_gz_path, "src/description/novamob_description.urdf")
+    trailer_model_path = os.path.join(novamob_nav2_gz_path, "src/description/novamob_trailer_description.urdf")
+    gz_models_path = os.path.join(novamob_nav2_gz_path, "models")
 
 
     # Launch configurations

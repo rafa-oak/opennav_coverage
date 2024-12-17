@@ -89,6 +89,7 @@ install(FILES test/test_field.xml
               test/cartesian_test_field.xml
               test/irregular_test_field.xml
               test/maize_test_field.xml
+              test/maize_test_field_wider.xml
   DESTINATION share/${PROJECT_NAME}/
 )
 

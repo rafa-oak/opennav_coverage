@@ -148,7 +148,7 @@ def main():
     navigator.startup()
 
     # Some example field
-    field = get_package_share_directory('opennav_coverage') + '/maize_test_field.xml'
+    field = get_package_share_directory('opennav_coverage') + '/maize_test_field_wider.xml'
     navigator.navigateCoverage(field)
 
     i = 0

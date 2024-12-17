@@ -31,7 +31,7 @@ def generate_launch_description():
     # Get the path to the scout_v2.xacro file
     scout_nav2_gz_path = get_package_share_directory('scout_nav2_gz')
 
-    default_world_path = os.path.join(scout_nav2_gz_path, 'world/maize_field.world')
+    default_world_path = os.path.join(coverage_demo_dir, 'maize_field_wider.world')
     param_file_path = os.path.join(coverage_demo_dir, 'demo_params_scout.yaml')
 
     default_model_path = os.path.join(scout_nav2_gz_path, "urdf/scout_v2/scout_v2.xacro")
@@ -83,7 +83,7 @@ def generate_launch_description():
             "scout",
             "-topic",
             "robot_description",
-            '-x', '-3.7', '-y', '-3.5', '-z', '1.00',
+            '-x', '-5', '-y', '-3.5', '-z', '1.00',
             '-R', '0.0', '-P', '0.0', '-Y', '0.0',
             "--ros-args",
             "--log-level",
@@ -146,7 +146,7 @@ def generate_launch_description():
             package='tf2_ros',
             executable='static_transform_publisher',
             output='screen',
-            arguments=['-3.5', '-3.5', '0', '0', '0', '0.0', 'map', 'odom'])
+            arguments=['-5', '-3.5', '0', '0', '0', '0.0', 'map', 'odom'])
     fake_gps_cmd = Node(
             package='tf2_ros',
             executable='static_transform_publisher',
