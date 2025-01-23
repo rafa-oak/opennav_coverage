@@ -42,6 +42,7 @@ def generate_launch_description():
     # Launch configurations
     use_sim_time = LaunchConfiguration("use_sim_time")
     use_trailer = LaunchConfiguration("use_trailer")
+    use_localization = LaunchConfiguration("use_localization")
     log_level = LaunchConfiguration("log_level")
     gz_verbosity = LaunchConfiguration("gz_verbosity")
     run_headless = LaunchConfiguration("run_headless")
@@ -151,6 +152,7 @@ def generate_launch_description():
 
     # Localize using odometry and IMU data. 
     robot_localization_node = Node(
+        condition=launch.conditions.IfCondition(use_localization),
         package="robot_localization",
         executable="ekf_node",
         name="ekf_filter_node",
@@ -160,7 +162,6 @@ def generate_launch_description():
             {"use_sim_time": use_sim_time},
         ],
     )
-
 
     # start the demo task
     demo_cmd = Node(

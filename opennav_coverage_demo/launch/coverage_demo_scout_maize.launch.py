@@ -42,6 +42,7 @@ def generate_launch_description():
     # Launch configurations
     use_sim_time = LaunchConfiguration("use_sim_time")
     use_trailer = LaunchConfiguration("use_trailer")
+    use_localization = LaunchConfiguration("use_localization")
     log_level = LaunchConfiguration("log_level")
     gz_verbosity = LaunchConfiguration("gz_verbosity")
     run_headless = LaunchConfiguration("run_headless")
@@ -147,6 +148,19 @@ def generate_launch_description():
             executable='static_transform_publisher',
             output='screen',
             arguments=['-5', '-5', '0', '0', '0', '0', 'map', 'odom'])
+
+    # Localize using odometry and IMU data. 
+    robot_localization_node = Node(
+        condition=launch.conditions.IfCondition(use_localization),
+        package="robot_localization",
+        executable="ekf_node",
+        name="ekf_filter_node",
+        output="screen",
+        parameters=[
+            os.path.join(scout_nav2_gz_path, "config/ekf.yaml"),
+            {"use_sim_time": use_sim_time},
+        ],
+    )
 
     # start the demo task
     demo_cmd = Node(
@@ -291,6 +305,7 @@ def generate_launch_description():
             rviz_cmd,
             bringup_cmd,
             fake_localization_cmd,
+            robot_localization_node,
             demo_cmd,
             relay_odom,
             relay_cmd_vel,            
