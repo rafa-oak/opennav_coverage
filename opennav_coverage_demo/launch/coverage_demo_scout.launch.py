@@ -146,11 +146,10 @@ def generate_launch_description():
             package='tf2_ros',
             executable='static_transform_publisher',
             output='screen',
-            arguments=['-5', '-5', '0', '0', '0', '0', 'map', 'odom'])
+            arguments=['-10', '-10', '0', '0', '0', '0', 'map', 'odom'])
 
 
     # Localize using odometry and IMU data. 
-    # It can be turned off because the navigation stack uses AMCL with lidar data for localization
     robot_localization_node = Node(
         package="robot_localization",
         executable="ekf_node",
@@ -163,36 +162,6 @@ def generate_launch_description():
     )
 
 
-    # Navigation goal node
-    nav_goal_node = Node(
-        package='nav2_simple_commander',
-        executable='navigate_to_pose',
-        name='navigate_to_pose',
-        output='screen',
-        parameters=[{
-            'goal_pose': {
-                'header': {
-                    'frame_id': 'map'
-                },
-                'pose': {
-                    'position': {
-                        'x': -10.0,
-                        'y': -10.0,
-                        'z': 0.0
-                    },
-                    'orientation': {
-                        'x': 0.0,
-                        'y': 0.0,
-                        'z': 0.0,
-                        'w': 1.0
-                    }
-                }
-            }
-        }],
-    )
-
-
-
     # start the demo task
     demo_cmd = Node(
         package='opennav_coverage_demo',
@@ -200,14 +169,6 @@ def generate_launch_description():
         emulate_tty=True,
         output='screen')
 
-
-    # Event handler to start demo_cmd after nav_goal_node reaches the goal
-    start_demo_cmd = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=nav_goal_node,
-            on_exit=[LogInfo(msg="Navigation goal reached, starting demo task"), demo_cmd]
-        )
-    )
 
     load_joint_state_controller = ExecuteProcess(
         name="activate_joint_state_broadcaster",
@@ -344,11 +305,9 @@ def generate_launch_description():
             rviz_cmd,
             bringup_cmd,
             fake_localization_cmd,
-            #robot_localization_node,
-            #nav_goal_node,
+            robot_localization_node,
             demo_cmd,
             relay_odom,
             relay_cmd_vel, 
-            #start_demo_cmd           
         ] + gazebo
     )

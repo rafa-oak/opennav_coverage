@@ -148,6 +148,19 @@ def generate_launch_description():
             output='screen',
             arguments=['-10', '-10', '0', '0', '0', '0', 'map', 'odom'])
 
+    # Localize using odometry and IMU data. 
+    robot_localization_node = Node(
+        package="robot_localization",
+        executable="ekf_node",
+        name="ekf_filter_node",
+        output="screen",
+        parameters=[
+            os.path.join(novamob_nav2_gz_path, "config/ekf.yaml"),
+            {"use_sim_time": use_sim_time},
+        ],
+    )
+
+
     # start the demo task
     demo_cmd = Node(
         package='opennav_coverage_demo',
@@ -291,6 +304,7 @@ def generate_launch_description():
             rviz_cmd,
             bringup_cmd,
             fake_localization_cmd,
+            robot_localization_node,
             demo_cmd,
             relay_odom,
             relay_cmd_vel,            
