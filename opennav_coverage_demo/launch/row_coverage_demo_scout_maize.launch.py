@@ -31,7 +31,7 @@ def generate_launch_description():
     # Get the path to the scout_v2.xacro file
     scout_nav2_gz_path = get_package_share_directory('scout_nav2_gz')
 
-    default_world_path = os.path.join(coverage_demo_dir, 'maize_field_wider.world')
+    default_world_path = os.path.join(scout_nav2_gz_path, 'world/maize_field_wider.world')
     param_file_path = os.path.join(coverage_demo_dir, 'demo_params_scout.yaml')
 
     default_model_path = os.path.join(scout_nav2_gz_path, "urdf/scout_v2/scout_v2.xacro")
@@ -312,7 +312,7 @@ def generate_launch_description():
             fake_localization_cmd,
             fake_gps_cmd,
             robot_localization_node,
-            demo_cmd,
+            #demo_cmd,
             relay_odom,
             relay_cmd_vel,            
         ] + gazebo
