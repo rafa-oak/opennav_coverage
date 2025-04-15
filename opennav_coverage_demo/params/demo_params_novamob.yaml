@@ -2,8 +2,8 @@ coverage_server:
   ros__parameters:
     use_sim_time: True
     default_headland_width: 0.25
-    robot_width: 0.225
-    operation_width: 0.225
+    robot_width: 0.23
+    operation_width: 0.23
     min_turning_radius: 0.35
     linear_curv_change: 200.0
     coordinates_in_cartesian_frame: true
@@ -14,8 +14,8 @@ coverage_server:
 row_coverage_server:
   ros__parameters:
     use_sim_time: True
-    robot_width: 0.225
-    operation_width: 0.225
+    robot_width: 0.23
+    operation_width: 0.23
     min_turning_radius: 0.35
     linear_curv_change: 200.0
     coordinates_in_cartesian_frame: true
@@ -27,7 +27,7 @@ bt_navigator:
     use_sim_time: True
     global_frame: map
     robot_base_frame: base_link
-    odom_topic: /odom
+    odom_topic: /odometry/filtered
     bt_loop_duration: 10
     default_server_timeout: 20
     # 'default_coverage_bt_xml' uses defaults:
@@ -70,7 +70,7 @@ controller_server:
     # RPP parameters
     FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
-      desired_linear_vel: 0.5
+      desired_linear_vel: 0.25
       lookahead_dist: 0.6
       min_lookahead_dist: 0.3
       max_lookahead_dist: 0.9
@@ -106,7 +106,7 @@ local_costmap:
       width: 3
       height: 3
       resolution: 0.05
-      footprint: "[ [0.5, 0.25], [0.5, -0.25], [-0.5, -0.25], [-0.5, 0.25] ]"
+      footprint: "[ [0.1255, 0.115], [0.1255, -0.115], [-0.1255, -0.115], [-0.1255, 0.115] ]"
       plugins: ["voxel_layer", "inflation_layer"]
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
@@ -148,11 +148,11 @@ velocity_smoother:
     smoothing_frequency: 20.0
     scale_velocities: False
     feedback: "OPEN_LOOP"
-    max_velocity: [0.5, 0.0, 2.0]
-    min_velocity: [-0.5, 0.0, -2.0]
+    max_velocity: [0.25, 0.0, 1.0]
+    min_velocity: [-0.25, 0.0, -1.0]
     max_accel: [2.5, 0.0, 5.2]
     max_decel: [-2.5, 0.0, -5.2]
-    odom_topic: "odom"
+    odom_topic: "odometry/filtered"
     odom_duration: 0.1
     deadband_velocity: [0.0, 0.0, 0.0]
     velocity_timeout: 1.0
