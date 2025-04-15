@@ -84,7 +84,7 @@ def generate_launch_description():
             "scout",
             "-topic",
             "robot_description",
-            '-x', '-10', '-y', '-10', '-z', '1.00',
+            '-x', '-10.0', '-y', '-10.0', '-z', '1.00',
             '-R', '0.0', '-P', '0.0', '-Y', '0.0',
             "--ros-args",
             "--log-level",
@@ -147,7 +147,7 @@ def generate_launch_description():
             package='tf2_ros',
             executable='static_transform_publisher',
             output='screen',
-            arguments=['-10', '-10', '0', '0', '0', '0', 'map', 'odom'])
+            arguments=['-10.0', '-10.0', '0', '0', '0', '0', 'map', 'odom'])
 
 
     # Localize using odometry and IMU data. 

@@ -84,7 +84,7 @@ def generate_launch_description():
             "scout",
             "-topic",
             "robot_description",
-            '-x', '-5.5', '-y', '-3.5', '-z', '1.00',
+            '-x', '-5.0', '-y', '3.5', '-z', '1.00',
             '-R', '0.0', '-P', '0.0', '-Y', '0.0',
             "--ros-args",
             "--log-level",
@@ -147,7 +147,7 @@ def generate_launch_description():
             package='tf2_ros',
             executable='static_transform_publisher',
             output='screen',
-            arguments=['-5', '-3.5', '0', '0', '0', '0.0', 'map', 'odom'])
+            arguments=['-5.0', '3.5', '0', '0', '0', '0.0', 'map', 'odom'])
     fake_gps_cmd = Node(
             package='tf2_ros',
             executable='static_transform_publisher',
