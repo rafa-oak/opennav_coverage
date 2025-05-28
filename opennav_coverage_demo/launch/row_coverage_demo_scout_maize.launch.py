@@ -31,10 +31,10 @@ def generate_launch_description():
     # Get the path to the scout_v2.xacro file
     scout_nav2_gz_path = get_package_share_directory('scout_nav2_gz')
 
-    default_world_path = os.path.join(scout_nav2_gz_path, 'world/maize_field_wider.world')
+    default_world_path = os.path.join(scout_nav2_gz_path, 'world/maize_field_wider_no_heightmap.world')
     param_file_path = os.path.join(coverage_demo_dir, 'demo_params_scout.yaml')
 
-    default_model_path = os.path.join(scout_nav2_gz_path, "urdf/scout_v2/scout_v2.xacro")
+    default_model_path = os.path.join(scout_nav2_gz_path, "urdf/scout_v2/scout_v2_no_cam.xacro")
     trailer_model_path = os.path.join(scout_nav2_gz_path, "urdf/scout_v2/scout_v2_trailer.xacro")
     gz_models_path = os.path.join(scout_nav2_gz_path, "models")
 
@@ -99,9 +99,6 @@ def generate_launch_description():
         arguments=[
             "/scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan",
             "/imu@sensor_msgs/msg/Imu[ignition.msgs.IMU",
-            "/sky_cam@sensor_msgs/msg/Image@ignition.msgs.Image",
-            "/depth_camera@sensor_msgs/msg/Image@ignition.msgs.Image",
-            "/robot_cam@sensor_msgs/msg/Image@ignition.msgs.Image",
             "/camera_info@sensor_msgs/msg/CameraInfo@ignition.msgs.CameraInfo",
             "/navsat@sensor_msgs/msg/NavSatFix[ignition.msgs.NavSat",
             # Clock message is necessary for the diff_drive_controller to accept commands https://github.com/ros-controls/gz_ros2_control/issues/106
@@ -112,6 +109,17 @@ def generate_launch_description():
         ],
         output="screen",
     )
+
+    image_bridge = Node(
+        package='ros_gz_image',
+        executable='image_bridge',
+        arguments=[
+            #"/robot_cam",
+            "/depth_camera"
+        ],
+        output='screen',
+    )   
+
 
 
     robot_state_publisher_node = Node(
