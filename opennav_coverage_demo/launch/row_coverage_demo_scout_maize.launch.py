@@ -31,8 +31,8 @@ def generate_launch_description():
     # Get the path to the scout_v2.xacro file
     scout_nav2_gz_path = get_package_share_directory('scout_nav2_gz')
 
-    default_world_path = os.path.join(scout_nav2_gz_path, 'world/maize_field_wider_no_heightmap.world')
-    param_file_path = os.path.join(coverage_demo_dir, 'demo_params_scout.yaml')
+    default_world_path = os.path.join(scout_nav2_gz_path, 'world/maize_field_wider.world')
+    param_file_path = os.path.join(coverage_demo_dir, 'demo_params_scout_amcl.yaml')
 
     default_model_path = os.path.join(scout_nav2_gz_path, "urdf/scout_v2/scout_v2_no_cam.xacro")
     trailer_model_path = os.path.join(scout_nav2_gz_path, "urdf/scout_v2/scout_v2_trailer.xacro")
@@ -147,7 +147,7 @@ def generate_launch_description():
     # start navigation
     bringup_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(coverage_demo_dir, 'row_bringup_scout.launch.py')),
+            os.path.join(coverage_demo_dir, 'row_bringup_scout_amcl.launch.py')),
         launch_arguments={'params_file': param_file_path}.items())
 
     # Demo GPS->map->odom transform, no localization. For visualization & controller transform
@@ -161,6 +161,7 @@ def generate_launch_description():
             executable='static_transform_publisher',
             output='screen',
             arguments=['0', '0', '0', '0', '0', '0', 'EPSG:4258', 'map'])
+
 
     # Localize using odometry and IMU data. 
     robot_localization_node = Node(
@@ -235,6 +236,18 @@ def generate_launch_description():
         ],
         output="screen",
     )
+
+    slam_localization = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            os.path.join(
+                get_package_share_directory("slam_toolbox"),
+                "launch",
+                "localization_launch.py"
+            )
+        ]),
+        launch_arguments={"use_sim_time": "True"}.items()
+    )
+
     return LaunchDescription(
         [
             SetEnvironmentVariable(
@@ -317,11 +330,12 @@ def generate_launch_description():
             ),
             rviz_cmd,
             bringup_cmd,
-            fake_localization_cmd,
+            #fake_localization_cmd,
             fake_gps_cmd,
             robot_localization_node,
             #demo_cmd,
             relay_odom,
-            relay_cmd_vel,            
+            relay_cmd_vel,       
+            slam_localization     
         ] + gazebo
     )

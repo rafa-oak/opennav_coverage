@@ -32,9 +32,9 @@ def generate_launch_description():
     scout_nav2_gz_path = get_package_share_directory('scout_nav2_gz')
 
     default_world_path = os.path.join(coverage_demo_dir, 'empty.sdf')
-    param_file_path = os.path.join(coverage_demo_dir, 'demo_params_scout.yaml')
+    param_file_path = os.path.join(coverage_demo_dir, 'demo_params_scout_amcl.yaml')
 
-    default_model_path = os.path.join(scout_nav2_gz_path, "urdf/scout_v2/scout_v2.xacro")
+    default_model_path = os.path.join(scout_nav2_gz_path, "urdf/scout_v2/scout_v2_no_cam.xacro")
     trailer_model_path = os.path.join(scout_nav2_gz_path, "urdf/scout_v2/scout_v2_trailer.xacro")
     gz_models_path = os.path.join(scout_nav2_gz_path, "models")
 
@@ -84,7 +84,7 @@ def generate_launch_description():
             "scout",
             "-topic",
             "robot_description",
-            '-x', '-10.0', '-y', '-10.0', '-z', '1.00',
+            '-x', '-10.5', '-y', '-10.5', '-z', '1.00',
             '-R', '0.0', '-P', '0.0', '-Y', '0.0',
             "--ros-args",
             "--log-level",
@@ -99,9 +99,6 @@ def generate_launch_description():
         arguments=[
             "/scan@sensor_msgs/msg/LaserScan[ignition.msgs.LaserScan",
             "/imu@sensor_msgs/msg/Imu[ignition.msgs.IMU",
-            "/sky_cam@sensor_msgs/msg/Image@ignition.msgs.Image",
-            "/depth_camera@sensor_msgs/msg/Image@ignition.msgs.Image",
-            "/robot_cam@sensor_msgs/msg/Image@ignition.msgs.Image",
             "/camera_info@sensor_msgs/msg/CameraInfo@ignition.msgs.CameraInfo",
             "/navsat@sensor_msgs/msg/NavSatFix[ignition.msgs.NavSat",
             # Clock message is necessary for the diff_drive_controller to accept commands https://github.com/ros-controls/gz_ros2_control/issues/106
@@ -112,6 +109,17 @@ def generate_launch_description():
         ],
         output="screen",
     )
+
+    image_bridge = Node(
+        package='ros_gz_image',
+        executable='image_bridge',
+        arguments=[
+            #"/robot_cam",
+            "/depth_camera"
+        ],
+        output='screen',
+    )   
+
 
 
     robot_state_publisher_node = Node(
@@ -139,15 +147,9 @@ def generate_launch_description():
     # start navigation
     bringup_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(coverage_demo_dir, 'bringup_scout.launch.py')),
+            os.path.join(coverage_demo_dir, 'bringup_scout_amcl.launch.py')),
         launch_arguments={'params_file': param_file_path}.items())
 
-    # world->odom transform, no localization. For visualization & controller transform
-    fake_localization_cmd = Node(
-            package='tf2_ros',
-            executable='static_transform_publisher',
-            output='screen',
-            arguments=['-10.0', '-10.0', '0', '0', '0', '0', 'map', 'odom'])
 
 
     # Localize using odometry and IMU data. 
@@ -170,6 +172,18 @@ def generate_launch_description():
         emulate_tty=True,
         output='screen')
 
+    relay_odom = Node(
+        name="relay_odom",
+        package="topic_tools",
+        executable="relay",
+        parameters=[
+            {
+                "input_topic": "/diff_drive_base_controller/odom",
+                "output_topic": "/odom",
+            }
+        ],
+        output="screen",
+    )
 
     load_joint_state_controller = ExecuteProcess(
         name="activate_joint_state_broadcaster",
@@ -199,18 +213,6 @@ def generate_launch_description():
         output="screen",
     )
 
-    relay_odom = Node(
-        name="relay_odom",
-        package="topic_tools",
-        executable="relay",
-        parameters=[
-            {
-                "input_topic": "/diff_drive_base_controller/odom",
-                "output_topic": "/odom",
-            }
-        ],
-        output="screen",
-    )
     relay_cmd_vel = Node(
         name="relay_cmd_vel",
         package="topic_tools",
@@ -223,6 +225,18 @@ def generate_launch_description():
         ],
         output="screen",
     )
+
+    slam_localization = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            os.path.join(
+                get_package_share_directory("slam_toolbox"),
+                "launch",
+                "localization_launch.py"
+            )
+        ]),
+        launch_arguments={"use_sim_time": "True"}.items()
+    )
+
     return LaunchDescription(
         [
             SetEnvironmentVariable(
@@ -305,10 +319,11 @@ def generate_launch_description():
             ),
             rviz_cmd,
             bringup_cmd,
-            fake_localization_cmd,
+            #fake_localization_cmd,
             robot_localization_node,
-            demo_cmd,
+            #demo_cmd,
             relay_odom,
-            relay_cmd_vel, 
+            relay_cmd_vel,       
+            slam_localization     
         ] + gazebo
     )
