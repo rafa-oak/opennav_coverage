@@ -31,7 +31,7 @@ def generate_launch_description():
     # Get the path to the scout_v2.xacro file
     scout_nav2_gz_path = get_package_share_directory('scout_nav2_gz')
 
-    default_world_path = os.path.join(coverage_demo_dir, 'empty.sdf')
+    default_world_path = os.path.join(coverage_demo_dir, 'empty2.sdf')
     param_file_path = os.path.join(coverage_demo_dir, 'demo_params_scout_amcl.yaml')
 
     default_model_path = os.path.join(scout_nav2_gz_path, "urdf/scout_v2/scout_v2_no_cam.xacro")
@@ -41,8 +41,8 @@ def generate_launch_description():
 
     # Launch configurations
     use_sim_time = LaunchConfiguration("use_sim_time")
-    use_trailer = LaunchConfiguration("use_trailer")
     use_localization = LaunchConfiguration("use_localization")
+    use_trailer = LaunchConfiguration("use_trailer")
     log_level = LaunchConfiguration("log_level")
     gz_verbosity = LaunchConfiguration("gz_verbosity")
     run_headless = LaunchConfiguration("run_headless")
@@ -84,7 +84,7 @@ def generate_launch_description():
             "scout",
             "-topic",
             "robot_description",
-            '-x', '-10.5', '-y', '-10.5', '-z', '1.00',
+            '-x', '-3.5', '-y', '-3.5', '-z', '1.00',
             '-R', '0.0', '-P', '0.0', '-Y', '0.0',
             "--ros-args",
             "--log-level",
@@ -150,6 +150,17 @@ def generate_launch_description():
             os.path.join(coverage_demo_dir, 'bringup_scout_amcl.launch.py')),
         launch_arguments={'params_file': param_file_path}.items())
 
+    # Demo GPS->map->odom transform, no localization. For visualization & controller transform
+    fake_localization_cmd = Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            output='screen',
+            arguments=['-5.0', '3.5', '0', '0', '0', '0.0', 'map', 'odom'])
+    fake_gps_cmd = Node(
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            output='screen',
+            arguments=['0', '0', '0', '0', '0', '0', 'EPSG:4258', 'map'])
 
 
     # Localize using odometry and IMU data. 
@@ -320,6 +331,7 @@ def generate_launch_description():
             rviz_cmd,
             bringup_cmd,
             #fake_localization_cmd,
+            fake_gps_cmd,
             robot_localization_node,
             #demo_cmd,
             relay_odom,

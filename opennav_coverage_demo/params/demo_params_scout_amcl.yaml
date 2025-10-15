@@ -53,7 +53,7 @@ coverage_server:
     default_headland_width: 0.25
     robot_width:  0.74
     operation_width: 0.74
-    min_turning_radius: 1.0
+    min_turning_radius: 0.7
     linear_curv_change: 200.0
     coordinates_in_cartesian_frame: true
     default_allow_overlap: false
@@ -119,7 +119,7 @@ controller_server:
     # RPP parameters
     FollowPath:
       plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
-      desired_linear_vel: 0.25
+      desired_linear_vel: 0.3
       lookahead_dist: 0.6
       min_lookahead_dist: 0.3
       max_lookahead_dist: 0.9

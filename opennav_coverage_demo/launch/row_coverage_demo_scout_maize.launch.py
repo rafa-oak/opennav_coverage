@@ -31,7 +31,7 @@ def generate_launch_description():
     # Get the path to the scout_v2.xacro file
     scout_nav2_gz_path = get_package_share_directory('scout_nav2_gz')
 
-    default_world_path = os.path.join(scout_nav2_gz_path, 'world/maize_field_wider.world')
+    default_world_path = os.path.join(scout_nav2_gz_path, 'world/maize_field_wider2.world')
     param_file_path = os.path.join(coverage_demo_dir, 'demo_params_scout_amcl.yaml')
 
     default_model_path = os.path.join(scout_nav2_gz_path, "urdf/scout_v2/scout_v2_no_cam.xacro")
